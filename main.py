@@ -154,8 +154,8 @@ class SimuladorMetro:
 
             if estacion in self.historial_express:
                 datos = self.historial_express[estacion]
-                ax.plot(datos['horas'], datos['suben'], label='Express - Suben ⬆', marker='o', linestyle='-', color='green')
-                ax.plot(datos['horas'], datos['bajan'], label='Express - Bajan ⬇', marker='x', linestyle='-', color='lime')
+                ax.plot(datos['horas'], datos['suben'], label='Express - Suben ⬆', marker='o', linestyle='-', color='red')
+                ax.plot(datos['horas'], datos['bajan'], label='Express - Bajan ⬇', marker='x', linestyle='-', color='black')
 
             ax.set_title(f"Comparativa de Pasajeros en {estacion}")
             ax.set_xlabel("Hora")
