@@ -10,14 +10,17 @@ import matplotlib.pyplot as plt
 class SimuladorMetro:
     def __init__(self):
         self.grafo_normal = GrafoMetro('flujo_estaciones_linea3.csv')
-        estaciones_express = ["Plaza Patria", "Guadalajara Centro"]  # Cambia por las que tengas realmente
+        estaciones_express = ["Plaza Patria", "Guadalajara Centro"]
         inicio = "Arcos de Zapopan"
         fin = "Central de Autobuses"
         self.grafo_express = GrafoMetroExpress(self.grafo_normal, estaciones_express, inicio, fin)
 
         self.trenes = self._inicializar_trenes()
         self.flujos_csv = self._cargar_flujos_csv()
-        self.historial_movimiento = {}  # {estacion: {'horas': [], 'suben': [], 'bajan': []}}
+
+        self.historial_normal = {}
+        self.historial_express = {}
+        self.historial_movimiento = self.historial_normal
 
     def _inicializar_trenes(self, total=15, express=3):
         inicio = self.grafo_normal.estaciones["Arcos de Zapopan"]
@@ -36,6 +39,7 @@ class SimuladorMetro:
             } for row in csv.DictReader(file)}
 
     def simular(self, dias=6, usar_express=False):
+        self.historial_movimiento = self.historial_express if usar_express else self.historial_normal
         for dia in range(1, dias + 1):
             print(f"\n=== Día {dia} {'(con Express)' if usar_express else ''} ===")
             self._simular_dia(usar_express)
@@ -44,7 +48,7 @@ class SimuladorMetro:
         grafo = self.grafo_express if usar_express else self.grafo_normal
         for hora in [6.5, 7.0, 7.5, 8.0, 8.5, 9.0]:
             self._actualizar_flujos(grafo)
-            self._mover_trenes()
+            self._mover_trenes(hora)
             self._mostrar_estado(grafo, hora)
 
     def _actualizar_flujos(self, grafo):
@@ -53,30 +57,22 @@ class SimuladorMetro:
                 rango = self.flujos_csv[nombre]
                 estacion.actualizar_flujo(random.randint(rango['min'], rango['max']))
 
-    def _mover_trenes(self):
+    def _mover_trenes(self, hora_actual):
         for tren in self.trenes:
             if tren.en_mantenimiento:
                 continue
 
-            # Selecciona el grafo según el tipo de tren
-            if isinstance(tren, TrenExpress):
-                grafo = self.grafo_express
-            else:
-                grafo = self.grafo_normal
-
+            grafo = self.grafo_express if isinstance(tren, TrenExpress) else self.grafo_normal
             estacion_actual = tren.estacion_actual
-            vecinos = grafo.obtener_vecinos(estacion_actual.nombre)  # vecinos es lista de nombres
+            vecinos = grafo.obtener_vecinos(estacion_actual.nombre)
 
             if vecinos:
                 if isinstance(tren, TrenExpress):
-                    vecinos_validos = [
-                        v for v in vecinos if
-                        v.startswith("Express") or v in ["Plaza Patria", "Guadalajara Centro",
-                                                         "Independencia", "Central de Autobuses"]
-                    ]
+                    vecinos_validos = [v for v in vecinos if
+                                       v.startswith("Express") or v in ["Plaza Patria", "Guadalajara Centro",
+                                                                        "Independencia", "Central de Autobuses"]]
                     if not vecinos_validos:
-                        print(
-                            f"Tren express {tren.id} no tiene vecinos válidos desde {estacion_actual.nombre}, no se mueve.")
+                        print(f"Tren express {tren.id} sin vecinos válidos desde {estacion_actual.nombre}")
                         continue
                     estacion_destino_nombre = random.choice(vecinos_validos)
                 else:
@@ -84,11 +80,10 @@ class SimuladorMetro:
 
                 estacion_destino = grafo.estaciones.get(estacion_destino_nombre)
                 if estacion_destino is None:
-                    print(
-                        f"Estación destino '{estacion_destino_nombre}' no encontrada en el grafo, salto movimiento del tren {tren.id}.")
+                    print(f"Estación destino '{estacion_destino_nombre}' no encontrada")
                     continue
 
-                resultado = tren.mover(estacion_destino)
+                resultado = tren.mover(estacion_destino, hora_actual=hora_actual, historial=self.historial_movimiento)
                 print(resultado)
 
     def _mostrar_estado(self, grafo, hora):
@@ -103,35 +98,35 @@ class SimuladorMetro:
                 estacion.registro_movimiento.clear()
 
     def simular_visualmente(self, dias=1, usar_express=False):
+        self.historial_movimiento = self.historial_express if usar_express else self.historial_normal
         grafo = self.grafo_express if usar_express else self.grafo_normal
         estaciones = list(grafo.estaciones.keys())
-
-        # Posiciones en eje x para cada estación (simplificado)
         posiciones = {nombre: i for i, nombre in enumerate(estaciones)}
 
         for dia in range(1, dias + 1):
             print(f"\n=== Día {dia} {'(con Express)' if usar_express else ''} ===")
             for hora in [6.5, 7.0, 7.5, 8.0, 8.5, 9.0]:
                 self._actualizar_flujos(grafo)
-                self._mover_trenes()
+                self._mover_trenes(hora)
                 self._mostrar_estado(grafo, hora)
 
-                # Visualización
                 plt.clf()
-                x_vals = []
-                y_vals = []
-                colores = []
-                labels = []
+                x_vals, y_vals, colores, labels = [], [], [], []
 
                 for nombre, estacion in grafo.estaciones.items():
                     x = posiciones[nombre]
+                    flujo = estacion.flujo_promedio or 0
+                    suben = sum([mov['suben'] for mov in getattr(estacion, 'registro_movimiento', [])])
+                    bajan = sum([mov['bajan'] for mov in getattr(estacion, 'registro_movimiento', [])])
+                    label = (f"{nombre}\n"
+                             f"{flujo} pax\n"
+                             f"{len(estacion.trenes_actuales)} trenes\n"
+                             f"⬆ {suben} ⬇ {bajan}")
                     x_vals.append(x)
                     y_vals.append(0)
-                    flujo = estacion.flujo_promedio or 0
                     colores.append(flujo)
-                    labels.append(f"{nombre}\n{flujo} pax\n{len(estacion.trenes_actuales)} trenes")
+                    labels.append(label)
 
-                # Dibujar estaciones
                 sc = plt.scatter(x_vals, y_vals, c=colores, cmap='coolwarm', s=200)
                 for i, label in enumerate(labels):
                     plt.text(x_vals[i], y_vals[i] + 0.1, label, ha='center', fontsize=8)
@@ -142,18 +137,39 @@ class SimuladorMetro:
                 plt.yticks([])
                 plt.pause(0.8)
 
-                suben = sum([mov['suben'] for mov in getattr(estacion, 'registro_movimiento', [])])
-                bajan = sum([mov['bajan'] for mov in getattr(estacion, 'registro_movimiento', [])])
-
-                label = (f"{nombre}\n"
-                         f"{flujo} pax\n"
-                         f"{len(estacion.trenes_actuales)} trenes\n"
-                         f"⬆ {suben} ⬇ {bajan}")
-                labels.append(label)
-
         plt.show()
 
+    def graficar_movimiento(self):
+        import matplotlib.pyplot as plt
 
+        estaciones = sorted(set(self.historial_normal.keys()).union(self.historial_express.keys()))
+
+        for estacion in estaciones:
+            fig, ax = plt.subplots(figsize=(9, 4))
+
+            if estacion in self.historial_normal:
+                datos = self.historial_normal[estacion]
+                ax.plot(datos['horas'], datos['suben'], label='Normal - Suben ⬆', marker='o', linestyle='--', color='blue')
+                ax.plot(datos['horas'], datos['bajan'], label='Normal - Bajan ⬇', marker='x', linestyle='--', color='skyblue')
+
+            if estacion in self.historial_express:
+                datos = self.historial_express[estacion]
+                ax.plot(datos['horas'], datos['suben'], label='Express - Suben ⬆', marker='o', linestyle='-', color='green')
+                ax.plot(datos['horas'], datos['bajan'], label='Express - Bajan ⬇', marker='x', linestyle='-', color='lime')
+
+            ax.set_title(f"Comparativa de Pasajeros en {estacion}")
+            ax.set_xlabel("Hora")
+            ax.set_ylabel("Cantidad de pasajeros")
+            ax.legend()
+            ax.grid(True)
+            horas = sorted(set(
+                self.historial_normal.get(estacion, {}).get('horas', []) +
+                self.historial_express.get(estacion, {}).get('horas', [])
+            ))
+            ax.set_xticks(horas)
+            ax.set_xticklabels([f"{h:.1f}" for h in horas], rotation=45)
+            plt.tight_layout()
+            plt.show()
 
 if __name__ == "__main__":
     simulador = SimuladorMetro()
@@ -162,9 +178,5 @@ if __name__ == "__main__":
 
     print("\n=== SIMULACIÓN CON RUTAS EXPRESS ===")
     simulador.simular(usar_express=True)
-
-    print("=== SIMULACIÓN VISUAL ===")
-    simulador.simular_visualmente(usar_express=False)
-
-    print("\n=== SIMULACIÓN VISUAL CON RUTAS EXPRESS ===")
-    simulador.simular_visualmente(usar_express=True)
+    print("\n=== GRAFICANDO COMPARATIVAS DE MOVIMIENTO ===")
+    simulador.graficar_movimiento()  # Compara ambos históricos

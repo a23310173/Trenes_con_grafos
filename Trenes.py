@@ -11,7 +11,7 @@ class Tren:
         self.pasajeros_actuales = 0
         self.tiempo_entre_estaciones = 4  # mins
 
-    def mover(self, estacion_destino):
+    def mover(self, estacion_destino, hora_actual=None, historial=None):
         if self.en_mantenimiento:
             return f"Tren {self.id} no puede moverse (en mantenimiento)"
 
@@ -49,6 +49,14 @@ class Tren:
             'bajan': bajan
         })
 
+        if historial is not None and hora_actual is not None:
+            nombre = estacion_destino.nombre
+            if nombre not in historial:
+                historial[nombre] = {'horas': [], 'suben': [], 'bajan': []}
+            historial[nombre]['horas'].append(hora_actual)
+            historial[nombre]['suben'].append(posibles_subir)
+            historial[nombre]['bajan'].append(bajan)
+
         return (f"Tren {self.id} ha llegado a {estacion_destino.nombre} "
                 f"(bajaron {bajan}, subieron {posibles_subir}, pasajeros actuales: {self.pasajeros_actuales})")
 
@@ -72,7 +80,7 @@ class TrenExpress(Tren):
         self.velocidad_maxima = 100  # km/h
         self.tiempo_entre_estaciones = 3  # mins
 
-    def mover(self, estacion_destino):
+    def mover(self, estacion_destino, hora_actual=None, historial=None):
         # Validación de estaciones permitidas para tren express
         estaciones_permitidas = ["Plaza Patria", "Guadalajara Centro", "Independencia", "Central de Autobuses"]
         if not estacion_destino.nombre.startswith("Express") and estacion_destino.nombre not in estaciones_permitidas:
@@ -111,6 +119,14 @@ class TrenExpress(Tren):
             'suben': posibles_subir,
             'bajan': bajan
         })
+
+        if historial is not None and hora_actual is not None:
+            nombre = estacion_destino.nombre
+            if nombre not in historial:
+                historial[nombre] = {'horas': [], 'suben': [], 'bajan': []}
+            historial[nombre]['horas'].append(hora_actual)
+            historial[nombre]['suben'].append(posibles_subir)
+            historial[nombre]['bajan'].append(bajan)
 
         return (f"Tren express {self.id} ha llegado a {estacion_destino.nombre} "
                 f"(bajaron {bajan}, subieron {posibles_subir}, pasajeros actuales: {self.pasajeros_actuales})")
