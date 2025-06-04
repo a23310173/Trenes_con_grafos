@@ -1,0 +1,17 @@
+Estación,Flujo Min (pasajeros/hora),Flujo Max (pasajeros/hora),Notas
+Arcos de Zapopan,800,1000,Origen de viajes
+Periférico Belenes,1200,1500,Conexión con rutas
+Plaza Patria,2500,3000,Estación crítica
+Circunvalación,600,900,Zona residencial
+Ávila Camacho,700,1000,Cercana a oficinas
+La Normal,500,800,Zona universitaria
+Santuario,900,1200,Intermedia
+Guadalajara Centro,2000,2500,Estación crítica
+Independencia,1800,2200,Estación crítica
+Plaza de la Bandera,1000,1300,Zona comercial
+CUCEI,800,1100,Universitaria
+Revolución,600,900,Zona industrial
+Río Nilo,500,800,Área periférica
+Tlaquepaque Centro,600,900,Zona turística
+Lázaro Cárdenas,700,1000,Conecta zonas
+Central de Autobuses,1500,1800,Terminal
