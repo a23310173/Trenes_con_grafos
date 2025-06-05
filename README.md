@@ -77,3 +77,40 @@ main.py	dias                | usar_express	Duración         |  tipo de simulaci
 
 ---
 
+##Metricas de rendimiento y caracteristicas implementadas
+
+-El sistema genera automáticamente:
+
+1. Gráficos de flujo por estación
+2. Comparativa Express vs Normal
+
+   # En main.py:
+self.historial_normal  # Almacena datos modo regular
+self.historial_express # Datos modo express
+
+3. Eficiencia por hora (pasajeros transportados/trenes activos)
+
+---
+
+##Posibles mejoras futuras
+
+-mejoras en simulacion
+
+1. Datos en tiempo real
+2. eventos aleatorios
+
+-Implementacion de algoritmos avanzados
+
+1.A* puede ser una opcion viable al ser mas eficiente que DIJKSTRA en grafios mas complejos
+
+---
+
+##Autores
+
+-Ivan Alejandro Lujan Amezcua
+-Santiago Ramirez Orozco
+-Luis Uriel Arriaga Castañeda
+
+##Profesora 
+
+-Ximena Aquino Perez
