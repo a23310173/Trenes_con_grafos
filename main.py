@@ -91,7 +91,7 @@ class SimuladorMetro:
         print(f"\n[hora = {hora_str}]")
         for nombre, estacion in grafo.estaciones.items():
             if nombre in self.flujos_csv or 'Express' in nombre:
-                print(f"{nombre}: {estacion.flujo_promedio} pax | {len(estacion.trenes_actuales)} trenes")
+                print(f"{nombre}: {estacion.flujo_promedio} pasajeros | {len(estacion.trenes_actuales)} trenes")
 
         for estacion in grafo.estaciones.values():
             if hasattr(estacion, 'registro_movimiento'):
@@ -119,7 +119,7 @@ class SimuladorMetro:
                     suben = sum([mov['suben'] for mov in getattr(estacion, 'registro_movimiento', [])])
                     bajan = sum([mov['bajan'] for mov in getattr(estacion, 'registro_movimiento', [])])
                     label = (f"{nombre}\n"
-                             f"{flujo} pax\n"
+                             f"{flujo} pasajeros\n"
                              f"{len(estacion.trenes_actuales)} trenes\n"
                              f"⬆ {suben} ⬇ {bajan}")
                     x_vals.append(x)

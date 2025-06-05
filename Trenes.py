@@ -1,7 +1,14 @@
 import random
 
 class Tren:
+    """Clase base para representar un tren del sistema de transporte."""
     def __init__(self, id_tren: int, estacion_actual=None, en_mantenimiento: bool = False):
+
+        """Args:
+        id_tren (int): Identificador único del tren.
+        estacion_actual (Estacion): Estación donde se encuentra el tren.
+        en_mantenimiento (bool): Indica si el tren está en mantenimiento.
+        """
         self.id = id_tren
         self.modelo = "Hitachi NS-74"
         self.capacidad = 230
@@ -13,6 +20,7 @@ class Tren:
 
     def mover(self, estacion_destino, hora_actual=None, historial=None):
         if self.en_mantenimiento:
+            """Intenta mover el tren a una nueva estación gestionando los pasajeros."""
             return f"Tren {self.id} no puede moverse (en mantenimiento)"
 
         # Bajada de pasajeros (entre 10% y 30% de los pasajeros actuales)
@@ -73,7 +81,11 @@ class Tren:
         return False
 
 class TrenExpress(Tren):
+    """Clase que representa un tren express del sistema de transporte."""
     def __init__(self, id_tren: int):
+        """Args:
+        id_tren (int): Identificador único del tren express.
+        """
         super().__init__(id_tren)
         self.modelo = "Hitachi NS-74 Express"
         self.capacidad = 300

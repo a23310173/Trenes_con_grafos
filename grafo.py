@@ -3,7 +3,10 @@ import heapq
 from Estaciones import Estacion
 
 class GrafoMetro:
+    """Clase que representa el grafo del Metro Línea 3 de Guadalajara."""
     def __init__(self, archivo_csv=None):
+        """Args:
+        archivo_csv (str): Ruta al archivo CSV con los datos de las estaciones."""
         self.estaciones = {}
         if archivo_csv:
             self._cargar_datos_csv(archivo_csv)
@@ -26,6 +29,7 @@ class GrafoMetro:
                     es_transbordo=es_transbordo
                 )
 
+    """Grafo del Metro Línea 3 de Guadalajara."""
     def _inicializar_conexiones(self):
         conexiones = [
             ("Arcos de Zapopan", "Periférico Belenes", 3),
@@ -66,7 +70,9 @@ class GrafoMetro:
         return list(self.estaciones.values())
 
     def encontrar_camino_mas_corto(self, inicio: str, fin: str):
-        """Algoritmo de Dijkstra para encontrar el camino más corto basado en tiempos."""
+        """Algoritmo de Dijkstra para encontrar el camino más corto basado en tiempos.
+        Returns:
+             tuple: (camino, tiempo_total):"""
         distancias = {est: float('inf') for est in self.estaciones}
         distancias[inicio] = 0
         prev = {est: None for est in self.estaciones}

@@ -1,7 +1,14 @@
 from grafo import GrafoMetro
 
 class GrafoMetroExpress(GrafoMetro):
+    """Clase que representa un grafo del Metro con estaciones express."""
     def __init__(self, grafo_original: GrafoMetro, estaciones_express: list, inicio: str, fin: str):
+        """Args:
+        grafo_original (GrafoMetro): Grafo original del Metro.
+        estaciones_express (list): Lista de nombres de estaciones express.
+        inicio (str): Nombre de la estación de inicio.
+        fin (str): Nombre de la estación de fin."""
+
         super().__init__(archivo_csv=None)  # grafo vacío
         nodos_a_incluir = set(estaciones_express)
         nodos_a_incluir.add(inicio)
@@ -30,7 +37,7 @@ class GrafoMetroExpress(GrafoMetro):
             return list(est.conexiones.keys())
         return []
 
-
+"""# Algoritmo de Dijkstra para encontrar el camino más corto en un grafo"""
 def dijkstra(grafo, inicio, fin):
     import heapq
 
