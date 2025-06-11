@@ -13,10 +13,11 @@ class GrafoMetro:
             self._inicializar_conexiones()
 
 
-
+    """Carga los datos de las estaciones desde un archivo CSV."""
     def _cargar_datos_csv(self, archivo_csv):
         with open(archivo_csv, mode='r', encoding='utf-8') as file:
             reader = csv.DictReader(file)
+            """Leer el archivo CSV y crear las estaciones."""
             for row in reader:
                 nombre = row['Estación']
                 flujo_min = int(row['Flujo Min (pasajeros/hora)'])
@@ -52,6 +53,7 @@ class GrafoMetro:
             self.agregar_conexion(origen, destino, tiempo)
 
     def obtener_vecinos(self, estacion):
+        """Obtiene las estaciones conectadas a una estación dada."""
         est = self.estaciones.get(estacion)
         if est:
             return list(est.conexiones.keys())
@@ -59,6 +61,7 @@ class GrafoMetro:
 
 
     def agregar_conexion(self, estacion1: str, estacion2: str, tiempo: int):
+        """Agrega una conexión entre dos estaciones con un tiempo de viaje."""
         if estacion1 in self.estaciones and estacion2 in self.estaciones:
             self.estaciones[estacion1].agregar_conexion(estacion2, tiempo)
             self.estaciones[estacion2].agregar_conexion(estacion1, tiempo)

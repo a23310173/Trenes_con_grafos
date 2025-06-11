@@ -58,6 +58,7 @@ class Tren:
         })
 
         if historial is not None and hora_actual is not None:
+            """Registra el movimiento del tren en el historial."""
             nombre = estacion_destino.nombre
             if nombre not in historial:
                 historial[nombre] = {'horas': [], 'suben': [], 'bajan': []}
@@ -69,12 +70,14 @@ class Tren:
                 f"(bajaron {bajan}, subieron {posibles_subir}, pasajeros actuales: {self.pasajeros_actuales})")
 
     def cargar_pasajeros(self, cantidad: int):
+        """Carga pasajeros al tren si hay espacio disponible."""
         if self.pasajeros_actuales + cantidad <= self.capacidad:
             self.pasajeros_actuales += cantidad
             return True
         return False
 
     def descargar_pasajeros(self, cantidad: int):
+        """Descarga pasajeros del tren si hay suficientes a bordo."""
         if self.pasajeros_actuales >= cantidad:
             self.pasajeros_actuales -= cantidad
             return True
@@ -133,6 +136,7 @@ class TrenExpress(Tren):
         })
 
         if historial is not None and hora_actual is not None:
+            """Registra el movimiento del tren express en el historial."""
             nombre = estacion_destino.nombre
             if nombre not in historial:
                 historial[nombre] = {'horas': [], 'suben': [], 'bajan': []}

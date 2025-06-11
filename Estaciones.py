@@ -38,3 +38,4 @@ class Estacion:
 
     def __str__(self):
         return f"{self.nombre} ({'Express' if self.es_express else 'Regular'})"
+    """Representación en cadena de la estación, indicando si es express o regular."""
